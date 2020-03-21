@@ -1,0 +1,7 @@
+{
+  "$schema": "https://raw.githubusercontent.com/hyperledger/fabric-chaincode-node/master/docs/_jsdoc/static/contract-schema.json",
+  "info": {
+    "title": "Paisley: Access Control Management",
+    "version": "alpha"
+  }
+}

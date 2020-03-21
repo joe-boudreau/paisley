@@ -1,5 +1,5 @@
-import {IArea} from "./interfaces";
-import StateObject from "./stateobject";
+import {IArea} from './interfaces'
+import StateObject from './stateobject'
 
 class Area extends StateObject implements IArea {
     public ingress: string[]
