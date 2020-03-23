@@ -1,4 +1,11 @@
-# Steps
+------------------------------------------------------------------------------------------------------------------------
+# SCRIPT INSTALLATION
+
+Usage: scripts/deployCC.sh {CHANNEL_NAME} {CC_SRC_PATH} {VERSION}
+Example: scripts/deployCC.sh org-channel ../chaincode/principal 5
+
+------------------------------------------------------------------------------------------------------------------------
+# MANUAL INSTALLATION
 
 - create crypto materials:
     bin/cryptogen generate --config=./crypto-config.yaml
@@ -41,7 +48,7 @@
     bin/peer lifecycle chaincode queryinstalled
 
 - Add an environment variable for the package ID:
-    export export CC_PACKAGE_ID=principal:{{ID}}
+    export CC_PACKAGE_ID=principal:{{ID}}
 
 - Approve the chaincode for the organization:
     bin/peer lifecycle chaincode approveformyorg -o localhost:7050 --ordererTLSHostnameOverride orderer.companyABC.com --channelID org-channel --name principal --version 1.0 --package-id $CC_PACKAGE_ID --sequence 1 --tls true --cafile crypto-config/ordererOrganizations/companyABC.com/orderers/orderer.companyABC.com/msp/tlscacerts/tlsca.companyABC.com-cert.pem
@@ -56,10 +63,17 @@
     bin/peer lifecycle chaincode querycommitted --channelID org-channel --name principal --cafile crypto-config/ordererOrganizations/companyABC.com/orderers/orderer.companyABC.com/msp/tlscacerts/tlsca.companyABC.com-cert.pem
 
 
+------------------------------------------------------------------------------------------------------------------------
+# USAGE
+
+- Create employee:
+    bin/peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.companyABC.com --tls true --cafile crypto-config/ordererOrganizations/companyABC.com/orderers/orderer.companyABC.com/msp/tlscacerts/tlsca.companyABC.com-cert.pem -C org-channel -n principal --peerAddresses localhost:7051 --tlsRootCertFiles crypto-config/peerOrganizations/org1.companyABC.com/peers/peer0.org1.companyABC.com/tls/ca.crt -c '{"Args":["createEmployee", "{\"name\": \"Joe Boudreau\", \"roles\": [\"Employee\"], \"badgeNumber\": 123456789, \"title\": \"Boss\", \"department\": \"Engineering\"}"]}'
+    
+        bin/peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.companyABC.com --tls true --cafile crypto-config/ordererOrganizations/companyABC.com/orderers/orderer.companyABC.com/msp/tlscacerts/tlsca.companyABC.com-cert.pem -C org-channel -n principal --peerAddresses localhost:7051 --tlsRootCertFiles crypto-config/peerOrganizations/org1.companyABC.com/peers/peer0.org1.companyABC.com/tls/ca.crt -c '{"Args":["principal:createEmployee", "{\"name\": \"Joe Boudreau\", \"roles\": [\"Employee\"], \"badgeNumber\": 123456789, \"title\": \"Boss\", \"department\": \"Engineering\"}"]}'
 
 
-
-Helpful commands:
+------------------------------------------------------------------------------------------------------------------------
+# MISC COMMANDS:
     logspout:
         scripts/monitordocker.sh paisley
     clear all docker volumes:

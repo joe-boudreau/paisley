@@ -2,10 +2,12 @@
   "name": "principal",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "dist/index.js",
   "scripts": {
     "test": "node_modules/.bin/tsc && jest",
-    "start": "node_modules/.bin/fabric-chaincode-node start"
+    "build": "tsc",
+    "start": "node_modules/.bin/fabric-chaincode-node start",
+    "start:dev": "node_modules/.bin/fabric-chaincode-node start --peer.address localhost:7051 --chaincode-id-name principal"
   },
   "dependencies": {
     "fabric-contract-api": "^2.0.0",

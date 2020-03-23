@@ -1,19 +1,21 @@
 class StateObject {
 
-    constructor(bufferOrJson?) {
-        if (bufferOrJson) { this.from(bufferOrJson) }
+    constructor(data?: Buffer | string | object) {
+        if (data) { this.from(data) }
     }
 
-    public from(bufferOrJson: Buffer | any) {
+    public from(data: Buffer | string | object) {
         let json
-        if (Buffer.isBuffer(bufferOrJson)) {
-            if (!bufferOrJson.length) {
+        if (Buffer.isBuffer(data)) {
+            if (!data.length) {
                 return
             }
 
-            json = JSON.parse(bufferOrJson.toString('utf-8'))
+            json = JSON.parse(data.toString('utf-8'))
+        } else if (typeof data === 'string') {
+            json = JSON.parse(data)
         } else {
-            json = bufferOrJson
+            json = data
         }
         return Object.assign(this, json)
     }

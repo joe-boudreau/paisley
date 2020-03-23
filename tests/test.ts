@@ -14,23 +14,9 @@ describe('test', () => {
         e.from(json)
         console.log(e.toJson())
 
-        let buffer = e.toBuffer();
+        const buffer = e.toBuffer()
 
         const e2 = new Employee(buffer)
         console.log(e2.toJson())
     })
-
-    it('tsest2', () => {
-        const foo = {
-            foo: 'foofdfdd'
-        }
-
-        destruct(foo)
-    })
 })
-
-function destruct(foo){
-    const { bar } = foo
-    console.log(bar)
-    if(!bar) console.log('not there')
-}

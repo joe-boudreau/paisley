@@ -1,18 +1,17 @@
 import {Context, Transaction} from 'fabric-contract-api'
 import { v4 as uuidv4 } from 'uuid'
-import Employee from '../../domain/employee'
-import {IEmployee} from '../../domain/interfaces'
-import { ContractBase } from '../contractbase'
+import { ContractBase } from './contractbase'
+import Employee from './domain/employee'
 
-export class PrincipalContract extends ContractBase {
+export class PrincipalContract  extends ContractBase {
 
     constructor() {
         super('principal')
     }
 
     @Transaction()
-    public async createEmployee(ctx: Context, details: IEmployee): Promise<void> {
-        const e = new Employee(details)
+    public async createEmployee(ctx: Context, employeeStr: string): Promise<void> {
+        const e = new Employee(employeeStr)
 
         // Generate ID value if none exists
         if (!e.id) { e.id = uuidv4() }
@@ -21,16 +20,17 @@ export class PrincipalContract extends ContractBase {
     }
 
     @Transaction()
-    public async updateEmployee(ctx: Context, details: IEmployee): Promise<void> {
-        if (!details.id) {
+    public async updateEmployee(ctx: Context, employeeStr: string): Promise<void> {
+        const newEmp = new Employee(employeeStr)
+        if (!newEmp.id) {
             throw new Error('Cannot update employee without providing an ID value')
         }
 
-        const key = this._getEmployeeKey(ctx, details.id)
+        const key = this._getEmployeeKey(ctx, newEmp.id)
         const existing = await ctx.stub.getState(key)
         const e = new Employee(existing)
 
-        const { badgeNumber, name, roles, title, department } = details
+        const { badgeNumber, name, roles, title, department } = newEmp
         e.badgeNumber = badgeNumber ?? e.badgeNumber
         e.name = name ?? e.name
         e.roles = roles ?? e.roles
@@ -41,28 +41,25 @@ export class PrincipalContract extends ContractBase {
     }
 
     @Transaction()
-    // TODO @Returns('Employee')
-    public async getEmployee(ctx: Context, id: string): Promise<Employee> {
+    public async getEmployee(ctx: Context, id: string): Promise<string> {
         const key = this._getEmployeeKey(ctx, id)
         const existing = await ctx.stub.getState(key)
-        return new Employee(existing)
+        return new Employee(existing).toJson()
     }
 
     @Transaction()
-    public async getAllEmployees(ctx: Context, id: string): Promise<Employee[]> {
+    public async getAllEmployees(ctx: Context): Promise<string[]> {
         const empIterator = await ctx.stub.getStateByPartialCompositeKey('employee', [])
-        const employees = new Array<Employee>()
+        const employees = new Array<string>()
         let e = await empIterator.next()
         while (!e.done) {
-            employees.push(new Employee(e.value))
+            employees.push(new Employee(e.value).toJson())
             e = await empIterator.next()
         }
         return employees
     }
 
-    private _getEmployeeKey(ctx, id: string) {
-        return ctx.createCompositeKey('employee', [id])
+    private _getEmployeeKey(ctx: Context, id: string) {
+        return ctx.stub.createCompositeKey('employee', [id])
     }
 }
-
-// module.exports = PrincipalContract

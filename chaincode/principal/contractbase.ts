@@ -21,5 +21,3 @@ export class ContractBase extends Contract {
     }
 
 }
-
-module.exports = ContractBase
