@@ -1,7 +1,9 @@
 import {Context, Transaction} from 'fabric-contract-api'
 import {v4 as uuidv4} from 'uuid'
+import {IPrincipal} from '../domain/interfaces'
+import {Utils} from '../utils'
 import {ContractBase} from './contractbase'
-import Area from './domain/area'
+import Area from '../domain/area'
 
 export class AreaContract  extends ContractBase {
 
@@ -20,8 +22,8 @@ export class AreaContract  extends ContractBase {
     }
 
     @Transaction()
-    public async updateArea(ctx: Context, areaJson: string): Promise<void> {
-        const updated = new Area(areaJson)
+    public async updateArea(ctx: Context, area: Area | string): Promise<void> {
+        const updated = new Area(area)
         if (!updated.id) {
             throw new Error('Cannot update area without providing an ID value')
         }
@@ -40,9 +42,9 @@ export class AreaContract  extends ContractBase {
     }
 
     @Transaction()
-    public async getArea(ctx: Context, id: string): Promise<string> {
+    public async getArea(ctx: Context, id: string): Promise<Area> {
         const existing = await ctx.stub.getState(this._getAreaKey(ctx, id))
-        return new Area(existing).toJson()
+        return new Area(existing)
     }
 
     @Transaction()
@@ -52,13 +54,11 @@ export class AreaContract  extends ContractBase {
     }
 
     @Transaction()
-    public async getAllAreas(ctx: Context): Promise<string[]> {
-        const areaIterator = await ctx.stub.getStateByPartialCompositeKey(this.getName(), [])
-        const areas = new Array<string>()
-        let a = await areaIterator.next()
-        while (!a.done) {
-            areas.push(new Area(a.value).toJson())
-            a = await areaIterator.next()
+    public async getAllAreas(ctx: Context): Promise<Area[]> {
+        const areaIterator = ctx.stub.getStateByPartialCompositeKey(this.getName(), [])
+        const areas = new Array<Area>()
+        for await (const result of areaIterator) {
+            areas.push(Utils.marshallToObject(result.value, {}))
         }
         return areas
     }

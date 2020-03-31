@@ -5,7 +5,7 @@ import {Context} from 'fabric-contract-api'
 import {ChaincodeStub} from 'fabric-shim-api'
 import {mocked} from 'ts-jest/utils'
 import {v4 as uuidv4} from 'uuid'
-import {PrincipalContract} from '../principalContract'
+import {PrincipalContract} from '../contracts/principalContract'
 
 
 
@@ -24,7 +24,7 @@ describe('create', () => {
 
         const contract = new PrincipalContract()
 
-        contract.createEmployee(mockCtx, JSON.stringify(emp))
+        // contract.createEmployee(mockCtx, JSON.stringify(emp))
 
         expect(mockCtx.stub.putState).toBeCalledWith('employee:12345', null)
 

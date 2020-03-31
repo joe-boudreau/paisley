@@ -6,12 +6,6 @@ export class ContractBase extends Contract {
         super(namespace)
     }
 
-    public _require(value, name) {
-        if (!value) {
-            throw new Error(`Parameter ${name} is missing.`)
-        }
-    }
-
     public async beforeTransaction(ctx: Context) {
         console.info(`============= START : ${ctx.stub.getFunctionAndParameters().fcn} ===========`)
     }

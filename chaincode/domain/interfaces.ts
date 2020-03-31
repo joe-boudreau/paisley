@@ -2,6 +2,8 @@ export interface IPrincipal {
     id?: string
     name: string
     roles: string[]
+    // This property must be derived from the set of policies defined in the system
+    resourceGrants: Set<string>
 }
 
 export interface IResource {

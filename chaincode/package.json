@@ -12,6 +12,7 @@
   "dependencies": {
     "fabric-contract-api": "^2.0.0",
     "fabric-shim": "^2.0.0",
+    "log4js": "^6.1.2",
     "uuid": "^7.0.1"
   },
   "devDependencies": {

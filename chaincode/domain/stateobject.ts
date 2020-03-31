@@ -1,27 +1,13 @@
+import {Utils} from '../utils'
+
 class StateObject {
 
     constructor(data?: Buffer | string | object) {
-        if (data) { this.from(data) }
-    }
-
-    public from(data: Buffer | string | object) {
-        let json
-        if (Buffer.isBuffer(data)) {
-            if (!data.length) {
-                return
-            }
-
-            json = JSON.parse(data.toString('utf-8'))
-        } else if (typeof data === 'string') {
-            json = JSON.parse(data)
-        } else {
-            json = data
-        }
-        return Object.assign(this, json)
+        if (data) { Utils.marshallToObject(data, this) }
     }
 
     public toJson(): string {
-        return JSON.stringify(this)
+        return JSON.stringify(this, Utils.replacer)
     }
 
     public toBuffer(): Buffer {
