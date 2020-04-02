@@ -10,4 +10,10 @@ class Policy extends StateObject implements IPolicy {
     public resourceTags?: string[]
 }
 
+// {
+//     "type": 2,
+//     "principalRoles": ["Employee"],
+//     "resourceTags": ["common"]
+// }
+
 export = Policy

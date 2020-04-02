@@ -67,15 +67,20 @@ Example: scripts/deployCC.sh org-channel ../chaincode/principal 5
 # USAGE
 
 - Create employee:
-    bin/peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.companyABC.com --tls true --cafile crypto-config/ordererOrganizations/companyABC.com/orderers/orderer.companyABC.com/msp/tlscacerts/tlsca.companyABC.com-cert.pem -C org-channel -n principal --peerAddresses localhost:7051 --tlsRootCertFiles crypto-config/peerOrganizations/org1.companyABC.com/peers/peer0.org1.companyABC.com/tls/ca.crt -c '{"Args":["createEmployee", "{\"name\": \"Joe Boudreau\", \"roles\": [\"Employee\"], \"badgeNumber\": 123456789, \"title\": \"Boss\", \"department\": \"Engineering\"}"]}'
+    bin/peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.companyABC.com --tls true --cafile crypto-config/ordererOrganizations/companyABC.com/orderers/orderer.companyABC.com/msp/tlscacerts/tlsca.companyABC.com-cert.pem -C org-channel -n chaincode --peerAddresses localhost:7051 --tlsRootCertFiles crypto-config/peerOrganizations/org1.companyABC.com/peers/peer0.org1.companyABC.com/tls/ca.crt -c '{"Args":["principal-employee:create", "{\"name\": \"Joe Boudreau\", \"roles\": [\"Employee\"], \"badgeNumber\": 123456789, \"title\": \"Boss\", \"department\": \"Engineering\"}"]}'
     
-        bin/peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.companyABC.com --tls true --cafile crypto-config/ordererOrganizations/companyABC.com/orderers/orderer.companyABC.com/msp/tlscacerts/tlsca.companyABC.com-cert.pem -C org-channel -n principal --peerAddresses localhost:7051 --tlsRootCertFiles crypto-config/peerOrganizations/org1.companyABC.com/peers/peer0.org1.companyABC.com/tls/ca.crt -c '{"Args":["principal:createEmployee", "{\"name\": \"Joe Boudreau\", \"roles\": [\"Employee\"], \"badgeNumber\": 123456789, \"title\": \"Boss\", \"department\": \"Engineering\"}"]}'
+- Create Area:
+    bin/peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.companyABC.com --tls true --cafile crypto-config/ordererOrganizations/companyABC.com/orderers/orderer.companyABC.com/msp/tlscacerts/tlsca.companyABC.com-cert.pem -C org-channel -n chaincode --peerAddresses localhost:7051 --tlsRootCertFiles crypto-config/peerOrganizations/org1.companyABC.com/peers/peer0.org1.companyABC.com/tls/ca.crt -c '{"Args":["area:createArea", "{\"name\":\"common-room\",\"tags\":[\"low-security\",\"common\",\"visitors-allowed\"],\"ingress\":[],\"egress\":[]}"]}'
 
+- Create Policy:
+    bin/peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.companyABC.com --tls true --cafile crypto-config/ordererOrganizations/companyABC.com/orderers/orderer.companyABC.com/msp/tlscacerts/tlsca.companyABC.com-cert.pem -C org-channel -n chaincode --peerAddresses localhost:7051 --tlsRootCertFiles crypto-config/peerOrganizations/org1.companyABC.com/peers/peer0.org1.companyABC.com/tls/ca.crt -c '{"Args":["policy:createPolicy", "{\"type\":2,\"principalRoles\":[\"Employee\"],\"resourceTags\":[\"common\"]}"]}'
 
 ------------------------------------------------------------------------------------------------------------------------
 # MISC COMMANDS:
     logspout:
         scripts/monitordocker.sh paisley
-    clear all docker volumes:
+    clear all docker volumes / containers / images:
         docker volume rm $(docker volume ls)
+        docker rm -f $(docker ps -aq)
+        docker rmi -f $(docker images -q)
 

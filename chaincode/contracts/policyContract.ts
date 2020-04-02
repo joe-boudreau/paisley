@@ -4,26 +4,18 @@ import {v4 as uuidv4} from 'uuid'
 import {IPrincipal, IResource, PolicyType} from '../domain/interfaces'
 import Policy from '../domain/policy'
 import {Utils} from '../utils'
-import {AreaContract} from './areaContract'
-import { ContractBase } from './contractbase'
-import {PrincipalContract} from './principalContract'
+import {ContractBase} from './contractbase'
+import {PrincipalContract} from './principal/principalContract'
+import {ResourceContract} from './resource/resourceContract'
 
-function matchingRoles(policy: Policy, principal: IPrincipal): boolean {
-    return principal.roles.some(policy.principalRoles.includes)
-}
-
-function matchingTags(policy: Policy, resource: IResource): boolean {
-    return resource.tags.some(policy.resourceTags.includes)
-}
-
-export class PolicyContract  extends ContractBase {
+export class PolicyContract extends ContractBase {
     private readonly principalContract: PrincipalContract
-    private readonly areaContract: AreaContract
+    private readonly resourceContract: ResourceContract
 
     constructor() {
         super('policy')
         this.principalContract = new PrincipalContract()
-        this.areaContract = new AreaContract()
+        this.resourceContract = new ResourceContract()
     }
 
     @Transaction()
@@ -82,11 +74,11 @@ export class PolicyContract  extends ContractBase {
         return await this._getPolicies(ctx)
     }
 
-    @Transaction()
     public async getAllPoliciesRelatedToPrincipal(ctx: Context, p: IPrincipal): Promise<Policy[]> {
         return await this._getPolicies(ctx, (policy: Policy) => policy.principalId === p.id || matchingRoles(policy, p))
     }
 
+    // TODO
     public async updateResourceAccessForPrincipal(ctx: Context, principalContract: PrincipalContract, p: IPrincipal) {
         const policies = await this.getAllPoliciesRelatedToPrincipal(ctx, p)
 
@@ -139,24 +131,26 @@ export class PolicyContract  extends ContractBase {
         const resources = await this._getResourceIDsUnderPolicy(ctx, p)
         const principalMap = await this._getPrincipalsUnderPolicy(ctx, p)
 
-        principalMap.forEach((principal, id) => {
+        for (const [id, principal] of principalMap) {
             resources.forEach(principal.resourceGrants.add)
-            this.principalContract.updatePrincipalByID(ctx, id, principal)
-        })
+            await this.principalContract.updateByID(ctx, id, principal)
+        }
     }
 
     private async _getResourceIDsUnderPolicy(ctx: Context, p: Policy): Promise<string[]> {
         switch (p.type) {
             case PolicyType.ID_RESOURCE:
             case PolicyType.ROLES_RESOURCE: {
-                return [(await this.areaContract.getArea(ctx, p.resourceId)).id]
+                const [_, resource] = await this.resourceContract.getByID(ctx, p.resourceId)
+                return [resource.id]
             }
 
             case PolicyType.ID_TAGS:
             case PolicyType.ROLES_TAGS: {
-                const resources = await this.areaContract.getAllAreas(ctx)
-                return resources.filter((resource) => matchingTags(p, resource))
-                    .map((a) => a.id)
+                const resourceMap = await this.resourceContract.getAll(ctx)
+                return Array.from(resourceMap.values())
+                    .filter((resource) => matchingTags(p, resource))
+                    .map((r) => r.id)
             }
         }
     }
@@ -165,13 +159,13 @@ export class PolicyContract  extends ContractBase {
         switch (p.type) {
             case PolicyType.ID_TAGS:
             case PolicyType.ID_RESOURCE: {
-                const result = await this.principalContract.getPrincipalByID(ctx, p.principalId)
+                const result = await this.principalContract.getByID(ctx, p.principalId)
                 return new Map([result])
             }
 
             case PolicyType.ROLES_TAGS:
             case PolicyType.ROLES_RESOURCE: {
-                const principalMap = await this.principalContract.getAllPrincipals(ctx)
+                const principalMap = await this.principalContract.getAll(ctx)
                 principalMap.forEach((v, k, map) => {
                     if (!matchingRoles(p, v)) {
                         map.delete(k)
@@ -185,4 +179,12 @@ export class PolicyContract  extends ContractBase {
     private _getPolicyKey(ctx: Context, id: string) {
         return ctx.stub.createCompositeKey(this.getName(), [id])
     }
+}
+
+function matchingRoles(policy: Policy, principal: IPrincipal): boolean {
+    return principal.roles.some(policy.principalRoles.includes)
+}
+
+function matchingTags(policy: Policy, resource: IResource): boolean {
+    return resource.tags.some(policy.resourceTags.includes)
 }

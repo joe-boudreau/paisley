@@ -1,11 +1,11 @@
 import {Context, Transaction} from 'fabric-contract-api'
 import log4js from 'log4js'
-import {IPrincipal} from '../domain/interfaces'
-import StateObject from '../domain/stateobject'
-import {Utils} from '../utils'
-import {ContractBase} from './contractbase'
+import {IPrincipal} from '../../domain/interfaces'
+import StateObject from '../../domain/stateobject'
+import {Utils} from '../../utils'
+import {ContractBase} from '../contractbase'
 
-log4js.configure('../log4js.json')
+log4js.configure('log4js.json')
 const logger = log4js.getLogger()
 
 export class PrincipalContract  extends ContractBase {
@@ -15,7 +15,7 @@ export class PrincipalContract  extends ContractBase {
     }
 
     @Transaction()
-    public async getAllPrincipals(ctx: Context): Promise<Map<string, IPrincipal>> {
+    public async getAll(ctx: Context): Promise<Map<string, IPrincipal>> {
         const iterator = ctx.stub.getStateByPartialCompositeKey(this.getName(), [])
         const principals = new Map<string, IPrincipal>()
         for await (const result of iterator) {
@@ -25,7 +25,7 @@ export class PrincipalContract  extends ContractBase {
     }
 
     @Transaction()
-    public async getPrincipalByID(ctx: Context, id: string): Promise<[string, IPrincipal]> {
+    public async getByID(ctx: Context, id: string): Promise<[string, IPrincipal]> {
         /**
          * TOOD: This is a bad implementation but I am limited by the hierarchical structure
          * of keys. Principal keys are stored as 'principal:{type}:{id}' so I cannot query
@@ -46,9 +46,7 @@ export class PrincipalContract  extends ContractBase {
         return null
     }
 
-
-    @Transaction()
-    public async updatePrincipalByID(ctx: Context, key: string, principal: IPrincipal): Promise<void> {
+    public async updateByID(ctx: Context, key: string, principal: IPrincipal): Promise<void> {
         await ctx.stub.putState(key, new StateObject(principal).toBuffer())
     }
 }

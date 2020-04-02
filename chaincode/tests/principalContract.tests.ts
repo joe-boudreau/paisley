@@ -5,7 +5,7 @@ import {Context} from 'fabric-contract-api'
 import {ChaincodeStub} from 'fabric-shim-api'
 import {mocked} from 'ts-jest/utils'
 import {v4 as uuidv4} from 'uuid'
-import {PrincipalContract} from '../contracts/principalContract'
+import {PrincipalContract} from '../contracts/principal/principalContract'
 
 
 

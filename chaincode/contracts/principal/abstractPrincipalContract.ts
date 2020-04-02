@@ -1,13 +1,11 @@
 import {Context, Transaction} from 'fabric-contract-api'
 import log4js from 'log4js'
 import {v4 as uuidv4} from 'uuid'
-import Area from '../domain/area'
-import {IPrincipal} from '../domain/interfaces'
-import StateObject from '../domain/stateobject'
-import {Utils} from '../utils'
-import {ContractBase} from './contractbase'
+import {IPrincipal} from '../../domain/interfaces'
+import StateObject from '../../domain/stateobject'
+import {ContractBase} from '../contractbase'
 
-log4js.configure('../log4js.json')
+log4js.configure('log4js.json')
 const log = log4js.getLogger()
 
 export class AbstractPrincipalContract<T extends StateObject> extends ContractBase {
@@ -15,24 +13,25 @@ export class AbstractPrincipalContract<T extends StateObject> extends ContractBa
     private readonly type: string
 
     constructor(type: string, Tconstructor: (new (d?) => T & IPrincipal)) {
-        super(`principal`)
+        super(`principal-${type}`)
         this.type = type
         this.objConstructor = Tconstructor
     }
 
     @Transaction()
-    public async create(ctx: Context, data: string): Promise<void> {
+    public async create(ctx: Context, data: string): Promise<string> {
         const p = new this.objConstructor(data)
 
         // Generate ID value if none exists
         if (!p.id) { p.id = uuidv4() }
 
         await ctx.stub.putState(this._getKey(ctx, p.id), p.toBuffer())
-        log.info(`Successfully added new principal with name: ${p.name} and ID: ${p.id}`)
+        log.info(`Successfully added new principal of type: ${this.type} with name: ${p.name} and ID: ${p.id}`)
+        return `Successfully added new principal of type: ${this.type} with name: ${p.name} and ID: ${p.id}`
     }
 
     @Transaction()
-    public async update(ctx: Context, data: T | string): Promise<void> {
+    public async update(ctx: Context, data: string): Promise<void> {
         // const newPrincipal = new this.objConstructor(data)
         //
         // if (!newPrincipal.id) {
@@ -57,15 +56,15 @@ export class AbstractPrincipalContract<T extends StateObject> extends ContractBa
     public async get(ctx: Context, id: string): Promise<T> {
         const existing = await ctx.stub.getState(this._getKey(ctx, id))
         const p = new this.objConstructor(existing)
-        log.info(`Successfully retrieved principal ID: ${p.id}`)
+        log.info(`Successfully retrieved principal with ID: ${p.id}`)
         return p
     }
 
     @Transaction()
     public async delete(ctx: Context, id: string): Promise<string> {
         await ctx.stub.deleteState(this._getKey(ctx, id))
-        log.info(`Successfully deleted principal ID: ${id}`)
-        return `Successfully deleted principal ID: ${id}`
+        log.info(`Successfully deleted principal with ID: ${id}`)
+        return `Successfully deleted principal with ID: ${id}`
     }
 
     @Transaction()
@@ -73,7 +72,7 @@ export class AbstractPrincipalContract<T extends StateObject> extends ContractBa
         const iterator = ctx.stub.getStateByPartialCompositeKey(this.getName(), [this.type])
         const principals = new Array<T>()
         for await (const result of iterator) {
-            principals.push(Utils.marshallToObject(result.value, {}))
+            principals.push(new this.objConstructor(result.value))
         }
         return principals
     }
