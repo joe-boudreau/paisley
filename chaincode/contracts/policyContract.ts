@@ -57,7 +57,7 @@ export class PolicyContract extends ContractBase {
         await ctx.stub.putState(key, p.toBuffer())
     }
 
-    @Transaction()
+    @Transaction(false)
     public async getPolicy(ctx: Context, id: string): Promise<Policy> {
         const existing = await ctx.stub.getState(this._getPolicyKey(ctx, id))
         return new Policy(existing)
@@ -69,7 +69,7 @@ export class PolicyContract extends ContractBase {
         return `Successfully deleted policy ID: ${id}`
     }
 
-    @Transaction()
+    @Transaction(false)
     public async getAllPolicies(ctx: Context): Promise<Policy[]> {
         return await this._getPolicies(ctx)
     }

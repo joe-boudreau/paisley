@@ -14,7 +14,7 @@ export class PrincipalContract  extends ContractBase {
         super('principal')
     }
 
-    @Transaction()
+    @Transaction(false)
     public async getAll(ctx: Context): Promise<Map<string, IPrincipal>> {
         const iterator = ctx.stub.getStateByPartialCompositeKey(this.getName(), [])
         const principals = new Map<string, IPrincipal>()
@@ -24,7 +24,7 @@ export class PrincipalContract  extends ContractBase {
         return principals
     }
 
-    @Transaction()
+    @Transaction(false)
     public async getByID(ctx: Context, id: string): Promise<[string, IPrincipal]> {
         /**
          * TOOD: This is a bad implementation but I am limited by the hierarchical structure

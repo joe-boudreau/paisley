@@ -52,7 +52,7 @@ export class AbstractPrincipalContract<T extends StateObject> extends ContractBa
         // await ctx.stub.putState(key, e.toBuffer())
     }
 
-    @Transaction()
+    @Transaction(false)
     public async get(ctx: Context, id: string): Promise<T> {
         const existing = await ctx.stub.getState(this._getKey(ctx, id))
         const p = new this.objConstructor(existing)
@@ -67,7 +67,7 @@ export class AbstractPrincipalContract<T extends StateObject> extends ContractBa
         return `Successfully deleted principal with ID: ${id}`
     }
 
-    @Transaction()
+    @Transaction(false)
     public async getAll(ctx: Context): Promise<T[]> {
         const iterator = ctx.stub.getStateByPartialCompositeKey(this.getName(), [this.type])
         const principals = new Array<T>()
