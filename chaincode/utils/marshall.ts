@@ -13,7 +13,6 @@ export class Marshall {
         } else {
             json = data
         }
-        console.log(`JSON: ${json}`)
         return Object.assign(obj, json)
     }
 

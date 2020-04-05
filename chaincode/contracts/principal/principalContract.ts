@@ -1,10 +1,10 @@
-import {Context, Transaction} from 'fabric-contract-api'
+import { Context, Transaction } from 'fabric-contract-api'
 import log4js from 'log4js'
-import {IPrincipal} from '../../domain/interfaces'
+import { IPrincipal } from '../../domain/interfaces'
 import StateObject from '../../domain/stateobject'
 import log from '../../utils/log'
-import {Marshall} from '../../utils/marshall'
-import {ContractBase} from '../contractbase'
+import { Marshall } from '../../utils/marshall'
+import { ContractBase } from '../contractbase'
 
 log4js.configure('log4js.json')
 const logger = log4js.getLogger()

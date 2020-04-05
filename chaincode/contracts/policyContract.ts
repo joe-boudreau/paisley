@@ -1,12 +1,12 @@
-import {Context, Transaction} from 'fabric-contract-api'
-import {v4 as uuidv4} from 'uuid'
-import {IPrincipal, IResource, PolicyType} from '../domain/interfaces'
+import { Context, Transaction } from 'fabric-contract-api'
+import { v4 as uuidv4 } from 'uuid'
+import { IPrincipal, IResource, PolicyType } from '../domain/interfaces'
 import Policy from '../domain/policy'
 import log from '../utils/log'
-import {Marshall} from '../utils/marshall'
-import {ContractBase} from './contractbase'
-import {PrincipalContract} from './principal/principalContract'
-import {ResourceContract} from './resource/resourceContract'
+import { Marshall } from '../utils/marshall'
+import { ContractBase } from './contractbase'
+import { PrincipalContract } from './principal/principalContract'
+import { ResourceContract } from './resource/resourceContract'
 
 
 export class PolicyContract extends ContractBase {
@@ -20,7 +20,7 @@ export class PolicyContract extends ContractBase {
     }
 
     @Transaction()
-    public async createPolicy(ctx: Context, policyStr: string): Promise<string> {
+    public async create(ctx: Context, policyStr: string): Promise<string> {
 
         try {
             const p = new Policy(policyStr)
@@ -30,8 +30,7 @@ export class PolicyContract extends ContractBase {
             // Generate ID value if none exists
             if (!p.id) { p.id = uuidv4() }
 
-
-            await ctx.stub.putState(this._getPolicyKey(ctx, p.id), p.toBuffer())
+            await ctx.stub.putState(this._getKey(ctx, p.id), p.toBuffer())
             log.info(`Added new policy with id ${p.id}`)
             await this._updateResourceAccess(ctx, p)
             return `Successfully added new access policy of type: ${PolicyType[p.type]} with ID: ${p.id}`
@@ -42,14 +41,14 @@ export class PolicyContract extends ContractBase {
     }
 
     @Transaction()
-    public async updatePolicy(ctx: Context, policyStr: string): Promise<void> {
+    public async update(ctx: Context, policyStr: string): Promise<void> {
         const newPolicy = new Policy(policyStr)
 
         if (!newPolicy.id) {
             throw new Error('Cannot update policy without providing an ID value')
         }
 
-        const key = this._getPolicyKey(ctx, newPolicy.id)
+        const key = this._getKey(ctx, newPolicy.id)
 
         const existing = await ctx.stub.getState(key)
         const p = new Policy(existing)
@@ -67,24 +66,24 @@ export class PolicyContract extends ContractBase {
     }
 
     @Transaction(false)
-    public async getPolicy(ctx: Context, id: string): Promise<Policy> {
-        const existing = await ctx.stub.getState(this._getPolicyKey(ctx, id))
+    public async get(ctx: Context, id: string): Promise<Policy> {
+        const existing = await ctx.stub.getState(this._getKey(ctx, id))
         return new Policy(existing)
     }
 
     @Transaction()
-    public async deletePolicy(ctx: Context, id: string): Promise<string> {
-        await ctx.stub.deleteState(this._getPolicyKey(ctx, id))
+    public async delete(ctx: Context, id: string): Promise<string> {
+        await ctx.stub.deleteState(this._getKey(ctx, id))
         // TODO: Update resource access for all principals
         return `Successfully deleted policy ID: ${id}`
     }
 
     @Transaction(false)
-    public async getAllPolicies(ctx: Context): Promise<Policy[]> {
+    public async getAll(ctx: Context): Promise<Policy[]> {
         return await this._getPolicies(ctx)
     }
 
-    public async updateResourceAccessForPrincipal(ctx: Context, p: IPrincipal) {
+    public async AddResourceAccessToPrincipal(ctx: Context, p: IPrincipal) {
         const {name, id} = p
         const policies = await this.getAllPoliciesRelatedToPrincipal(ctx, p)
 
@@ -95,8 +94,25 @@ export class PolicyContract extends ContractBase {
         log.info(`Principal ID: ${id}, Name: ${name} granted access to the following resources: ${p.resourceGrants}`)
     }
 
+    public async newResourceUpdate(ctx: Context, r: IResource) {
+        const policies = await this.getAllPoliciesRelatedToResource(ctx, r)
+
+        for (const policy of policies) {
+            const principalMap = await this._getPrincipalsUnderPolicy(ctx, policy)
+            for (const [id, p] of principalMap) {
+                this.addResourcesToPrincipal(p, [r.id]) // only add the new resource to the resource list
+                await this.principalContract.updateByID(ctx, id, p)
+                log.info(`Principal ID: ${p.id}, Name: ${p.name} granted access to new resource: ${r.name}`)
+            }
+        }
+    }
+
     private async getAllPoliciesRelatedToPrincipal(ctx: Context, p: IPrincipal): Promise<Policy[]> {
         return await this._getPolicies(ctx, (policy: Policy) => policy.principalId === p.id || matchingRoles(policy, p))
+    }
+
+    private async getAllPoliciesRelatedToResource(ctx: Context, r: IResource): Promise<Policy[]> {
+        return await this._getPolicies(ctx, (policy: Policy) => policy.resourceId === r.id || matchingTags(policy, r))
     }
 
     private async _getPolicies(ctx: Context, filter?: (p: Policy) => boolean): Promise<Policy[]> {
@@ -204,7 +220,7 @@ export class PolicyContract extends ContractBase {
         }
     }
 
-    private _getPolicyKey(ctx: Context, id: string) {
+    private _getKey(ctx: Context, id: string) {
         return ctx.stub.createCompositeKey(this.getName(), [id])
     }
 }

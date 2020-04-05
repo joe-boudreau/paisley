@@ -5,29 +5,33 @@ import {IResource} from '../../domain/interfaces'
 import StateObject from '../../domain/stateobject'
 import log from '../../utils/log'
 import {ContractBase} from '../contractbase'
+import {PolicyContract} from '../policyContract'
 
 
 const keyObject = 'resource'
 export class AbstractResourceContract<T extends StateObject> extends ContractBase {
     private readonly objConstructor: new (d?) => T & IResource
     private readonly type: string
+    private readonly policyContract: PolicyContract
 
     constructor(type: string, Tconstructor: (new (d?) => T & IResource)) {
         super(`${keyObject}-${type}`)
         this.type = type
         this.objConstructor = Tconstructor
+        this.policyContract = new PolicyContract()
     }
 
     @Transaction()
     public async create(ctx: Context, data: string): Promise<string> {
-        const p = new this.objConstructor(data)
+        const r = new this.objConstructor(data)
 
         // Generate ID value if none exists
-        if (!p.id) { p.id = uuidv4() }
+        if (!r.id) { r.id = uuidv4() }
 
-        await ctx.stub.putState(this._getKey(ctx, p.id), p.toBuffer())
-        log.info(`Successfully added new resource of type: ${this.type} with name: ${p.name} and ID: ${p.id}`)
-        return `Successfully added new resource of type: ${this.type} with name: ${p.name} and ID: ${p.id}`
+        await ctx.stub.putState(this._getKey(ctx, r.id), r.toBuffer())
+        await this.policyContract.newResourceUpdate(ctx, r)
+        log.info(`Successfully added new resource of type: ${this.type} with name: ${r.name} and ID: ${r.id}`)
+        return `Successfully added new resource of type: ${this.type} with name: ${r.name} and ID: ${r.id}`
     }
 
     @Transaction()

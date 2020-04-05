@@ -1,10 +1,10 @@
-import {Context, Transaction} from 'fabric-contract-api'
+import { Context, Transaction } from 'fabric-contract-api'
 import log4js from 'log4js'
-import {v4 as uuidv4} from 'uuid'
-import {IPrincipal} from '../../domain/interfaces'
+import { v4 as uuidv4 } from 'uuid'
+import { IPrincipal } from '../../domain/interfaces'
 import StateObject from '../../domain/stateobject'
-import {ContractBase} from '../contractbase'
-import {PolicyContract} from '../policyContract'
+import { ContractBase } from '../contractbase'
+import { PolicyContract } from '../policyContract'
 
 log4js.configure('log4js.json')
 const log = log4js.getLogger()
@@ -13,11 +13,13 @@ const keyObject = 'principal'
 export class AbstractPrincipalContract<T extends StateObject> extends ContractBase {
     private readonly objConstructor: new (d?) => T & IPrincipal
     private readonly type: string
+    private readonly policyContract: PolicyContract
 
     constructor(type: string, Tconstructor: (new (d?) => T & IPrincipal)) {
         super(`${keyObject}-${type}`)
         this.type = type
         this.objConstructor = Tconstructor
+        this.policyContract = new PolicyContract()
     }
 
     @Transaction()
@@ -27,7 +29,7 @@ export class AbstractPrincipalContract<T extends StateObject> extends ContractBa
         // Generate ID value if none exists
         if (!p.id) { p.id = uuidv4() }
 
-        new PolicyContract().updateResourceAccessForPrincipal(ctx, p)
+        await this.policyContract.AddResourceAccessToPrincipal(ctx, p)
         await ctx.stub.putState(this._getKey(ctx, p.id), p.toBuffer())
         log.info(`Successfully added new principal of type: ${this.type} with name: ${p.name} and ID: ${p.id}`)
         return `Successfully added new principal of type: ${this.type} with name: ${p.name} and ID: ${p.id}`

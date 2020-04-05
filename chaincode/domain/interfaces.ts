@@ -42,3 +42,12 @@ export enum PolicyType {
     ROLES_TAGS,
     ROLES_RESOURCE,
 }
+
+export interface IAccessEvent {
+    id: string
+    granted: boolean
+    principalId: string
+    resourceId: string
+    timestamp: Date
+    notes?: string
+}
