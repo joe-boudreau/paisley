@@ -4,16 +4,18 @@ import {v4 as uuidv4} from 'uuid'
 import {IPrincipal} from '../../domain/interfaces'
 import StateObject from '../../domain/stateobject'
 import {ContractBase} from '../contractbase'
+import {PolicyContract} from '../policyContract'
 
 log4js.configure('log4js.json')
 const log = log4js.getLogger()
 
+const keyObject = 'principal'
 export class AbstractPrincipalContract<T extends StateObject> extends ContractBase {
     private readonly objConstructor: new (d?) => T & IPrincipal
     private readonly type: string
 
     constructor(type: string, Tconstructor: (new (d?) => T & IPrincipal)) {
-        super(`principal-${type}`)
+        super(`${keyObject}-${type}`)
         this.type = type
         this.objConstructor = Tconstructor
     }
@@ -25,6 +27,7 @@ export class AbstractPrincipalContract<T extends StateObject> extends ContractBa
         // Generate ID value if none exists
         if (!p.id) { p.id = uuidv4() }
 
+        new PolicyContract().updateResourceAccessForPrincipal(ctx, p)
         await ctx.stub.putState(this._getKey(ctx, p.id), p.toBuffer())
         log.info(`Successfully added new principal of type: ${this.type} with name: ${p.name} and ID: ${p.id}`)
         return `Successfully added new principal of type: ${this.type} with name: ${p.name} and ID: ${p.id}`
@@ -69,7 +72,7 @@ export class AbstractPrincipalContract<T extends StateObject> extends ContractBa
 
     @Transaction(false)
     public async getAll(ctx: Context): Promise<T[]> {
-        const iterator = ctx.stub.getStateByPartialCompositeKey(this.getName(), [this.type])
+        const iterator = ctx.stub.getStateByPartialCompositeKey(keyObject, [this.type])
         const principals = new Array<T>()
         for await (const result of iterator) {
             principals.push(new this.objConstructor(result.value))
@@ -78,6 +81,6 @@ export class AbstractPrincipalContract<T extends StateObject> extends ContractBa
     }
 
     private _getKey(ctx: Context, id: string) {
-        return ctx.stub.createCompositeKey(this.getName(), [this.type, id])
+        return ctx.stub.createCompositeKey(keyObject, [this.type, id])
     }
 }

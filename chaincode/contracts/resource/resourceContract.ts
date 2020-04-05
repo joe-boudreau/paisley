@@ -2,7 +2,8 @@ import {Context, Transaction} from 'fabric-contract-api'
 import log4js from 'log4js'
 import {IResource} from '../../domain/interfaces'
 import StateObject from '../../domain/stateobject'
-import {Utils} from '../../utils'
+import log from '../../utils/log'
+import {Marshall} from '../../utils/marshall'
 import {ContractBase} from '../contractbase'
 
 log4js.configure('log4js.json')
@@ -19,7 +20,9 @@ export class ResourceContract  extends ContractBase {
         const iterator = ctx.stub.getStateByPartialCompositeKey(this.getName(), [])
         const resources = new Map<string, IResource>()
         for await (const result of iterator) {
-            resources.set(result.key, Utils.marshallToObject(result.value, {}))
+            const r = Marshall.marshallToObject(result.value, {})
+            log.debug(`Resource found: ${JSON.stringify(r)}`)
+            resources.set(result.key, r)
         }
         return resources
     }
@@ -37,7 +40,7 @@ export class ResourceContract  extends ContractBase {
          */
         const iterator = ctx.stub.getStateByPartialCompositeKey(this.getName(), [])
         for await (const result of iterator) {
-            const resource = Utils.marshallToObject(result.value, {}) as IResource
+            const resource = Marshall.marshallToObject(result.value, {}) as IResource
             if (resource.id === id) {
                 return [result.key, resource]
             }

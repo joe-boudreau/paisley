@@ -1,13 +1,13 @@
-import {Utils} from '../utils'
+import {Marshall} from '../utils/marshall'
 
 class StateObject {
 
     constructor(data?: Buffer | string | object) {
-        if (data) { Utils.marshallToObject(data, this) }
+        if (data) { Marshall.marshallToObject(data, this) }
     }
 
     public toJson(): string {
-        return JSON.stringify(this, Utils.replacer)
+        return JSON.stringify(this, Marshall.replacer)
     }
 
     public toBuffer(): Buffer {

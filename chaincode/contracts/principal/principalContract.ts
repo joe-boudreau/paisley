@@ -2,7 +2,8 @@ import {Context, Transaction} from 'fabric-contract-api'
 import log4js from 'log4js'
 import {IPrincipal} from '../../domain/interfaces'
 import StateObject from '../../domain/stateobject'
-import {Utils} from '../../utils'
+import log from '../../utils/log'
+import {Marshall} from '../../utils/marshall'
 import {ContractBase} from '../contractbase'
 
 log4js.configure('log4js.json')
@@ -19,7 +20,7 @@ export class PrincipalContract  extends ContractBase {
         const iterator = ctx.stub.getStateByPartialCompositeKey(this.getName(), [])
         const principals = new Map<string, IPrincipal>()
         for await (const result of iterator) {
-            principals.set(result.key, Utils.marshallToObject(result.value, {}))
+            principals.set(result.key, Marshall.marshallToObject(result.value, {}))
         }
         return principals
     }
@@ -37,7 +38,7 @@ export class PrincipalContract  extends ContractBase {
          */
         const iterator = ctx.stub.getStateByPartialCompositeKey(this.getName(), [])
         for await (const result of iterator) {
-            const principal = Utils.marshallToObject(result.value, {}) as IPrincipal
+            const principal = Marshall.marshallToObject(result.value, {}) as IPrincipal
             if (principal.id === id) {
                 return [result.key, principal]
             }
@@ -47,6 +48,8 @@ export class PrincipalContract  extends ContractBase {
     }
 
     public async updateByID(ctx: Context, key: string, principal: IPrincipal): Promise<void> {
+        ctx.stub.splitCompositeKey(key)
         await ctx.stub.putState(key, new StateObject(principal).toBuffer())
+        log.info(`Updated state for principal key: ${key}`)
     }
 }

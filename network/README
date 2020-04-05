@@ -2,7 +2,7 @@
 # SCRIPT INSTALLATION
 
 Usage: scripts/deployCC.sh {CHANNEL_NAME} {CC_SRC_PATH} {VERSION}
-Example: scripts/deployCC.sh org-channel ../chaincode/principal 5
+Example: scripts/deployCC.sh org-channel ../chaincode 5
 
 ------------------------------------------------------------------------------------------------------------------------
 # MANUAL INSTALLATION
@@ -68,13 +68,18 @@ Example: scripts/deployCC.sh org-channel ../chaincode/principal 5
 
 - Create employee:
     bin/peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.companyABC.com --tls true --cafile crypto-config/ordererOrganizations/companyABC.com/orderers/orderer.companyABC.com/msp/tlscacerts/tlsca.companyABC.com-cert.pem -C org-channel -n chaincode --peerAddresses localhost:7051 --tlsRootCertFiles crypto-config/peerOrganizations/org1.companyABC.com/peers/peer0.org1.companyABC.com/tls/ca.crt -c '{"Args":["principal-employee:create", "{\"name\": \"Joe Boudreau\", \"roles\": [\"Employee\"], \"badgeNumber\": 123456789, \"title\": \"Boss\", \"department\": \"Engineering\"}"]}'
+- Get all employees:
+    bin/peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.companyABC.com --tls true --cafile crypto-config/ordererOrganizations/companyABC.com/orderers/orderer.companyABC.com/msp/tlscacerts/tlsca.companyABC.com-cert.pem -C org-channel -n chaincode --peerAddresses localhost:7051 --tlsRootCertFiles crypto-config/peerOrganizations/org1.companyABC.com/peers/peer0.org1.companyABC.com/tls/ca.crt -c '{"Args":["principal-employee:getAll"]}'
     
 - Create Area:
-    bin/peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.companyABC.com --tls true --cafile crypto-config/ordererOrganizations/companyABC.com/orderers/orderer.companyABC.com/msp/tlscacerts/tlsca.companyABC.com-cert.pem -C org-channel -n chaincode --peerAddresses localhost:7051 --tlsRootCertFiles crypto-config/peerOrganizations/org1.companyABC.com/peers/peer0.org1.companyABC.com/tls/ca.crt -c '{"Args":["area:createArea", "{\"name\":\"common-room\",\"tags\":[\"low-security\",\"common\",\"visitors-allowed\"],\"ingress\":[],\"egress\":[]}"]}'
+    bin/peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.companyABC.com --tls true --cafile crypto-config/ordererOrganizations/companyABC.com/orderers/orderer.companyABC.com/msp/tlscacerts/tlsca.companyABC.com-cert.pem -C org-channel -n chaincode --peerAddresses localhost:7051 --tlsRootCertFiles crypto-config/peerOrganizations/org1.companyABC.com/peers/peer0.org1.companyABC.com/tls/ca.crt -c '{"Args":["resource-area:create", "{\"name\":\"common-room\",\"tags\":[\"low-security\",\"common\",\"visitors-allowed\"],\"ingress\":[],\"egress\":[]}"]}'
+- Get all Areas:
+    bin/peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.companyABC.com --tls true --cafile crypto-config/ordererOrganizations/companyABC.com/orderers/orderer.companyABC.com/msp/tlscacerts/tlsca.companyABC.com-cert.pem -C org-channel -n chaincode --peerAddresses localhost:7051 --tlsRootCertFiles crypto-config/peerOrganizations/org1.companyABC.com/peers/peer0.org1.companyABC.com/tls/ca.crt -c '{"Args":["resource-area:getAll"]}'
 
 - Create Policy:
     bin/peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.companyABC.com --tls true --cafile crypto-config/ordererOrganizations/companyABC.com/orderers/orderer.companyABC.com/msp/tlscacerts/tlsca.companyABC.com-cert.pem -C org-channel -n chaincode --peerAddresses localhost:7051 --tlsRootCertFiles crypto-config/peerOrganizations/org1.companyABC.com/peers/peer0.org1.companyABC.com/tls/ca.crt -c '{"Args":["policy:createPolicy", "{\"type\":2,\"principalRoles\":[\"Employee\"],\"resourceTags\":[\"common\"]}"]}'
-
+- Get all Policies:
+    bin/peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.companyABC.com --tls true --cafile crypto-config/ordererOrganizations/companyABC.com/orderers/orderer.companyABC.com/msp/tlscacerts/tlsca.companyABC.com-cert.pem -C org-channel -n chaincode --peerAddresses localhost:7051 --tlsRootCertFiles crypto-config/peerOrganizations/org1.companyABC.com/peers/peer0.org1.companyABC.com/tls/ca.crt -c '{"Args":["policy:getAllPolicies"]}'
 ------------------------------------------------------------------------------------------------------------------------
 # MISC COMMANDS:
     logspout:

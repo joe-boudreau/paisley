@@ -8,9 +8,12 @@ import { AreaContract } from './contracts/resource/areaContract'
 export { AreaContract } from './contracts/resource/areaContract'
 import { PolicyContract } from './contracts/policyContract'
 export { PolicyContract } from './contracts/policyContract'
+import {ResourceContract} from './contracts/resource/resourceContract'
+export {ResourceContract} from './contracts/resource/resourceContract'
 
 export const contracts: any[] = [EmployeeContract,
                                  VisitorContract,
                                  PrincipalContract,
+                                 ResourceContract,
                                  AreaContract,
                                  PolicyContract]

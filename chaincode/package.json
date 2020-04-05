@@ -7,17 +7,17 @@
     "test": "../../node_modules/.bin/tsc && jest",
     "build": "tsc",
     "start": "node_modules/.bin/fabric-chaincode-node start",
-    "start:dev": "tsc && node_modules/.bin/fabric-chaincode-node start --peer.address localhost:7051 --chaincode-id-name principal"
+    "start:dev": "tsc && node_modules/.bin/fabric-chaincode-node start --peer.address localhost:7051 --chaincode-id-name chaincode-test"
   },
   "dependencies": {
     "fabric-contract-api": "^2.0.0",
     "fabric-shim": "^2.0.0",
     "log4js": "^6.1.2",
     "uuid": "^7.0.1",
-    "tslint": "^5.11.0",
-    "typescript": "^3.1.6"
+    "tslint": "^5.11.0"
   },
   "devDependencies": {
+    "typescript": "^3.1.6",
     "@types/jest": "^25.1.4",
     "bufferutil": "^4.0.1",
     "canvas": "^2.6.1",

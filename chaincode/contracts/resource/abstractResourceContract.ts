@@ -3,17 +3,17 @@ import log4js from 'log4js'
 import {v4 as uuidv4} from 'uuid'
 import {IResource} from '../../domain/interfaces'
 import StateObject from '../../domain/stateobject'
+import log from '../../utils/log'
 import {ContractBase} from '../contractbase'
 
-log4js.configure('log4js.json')
-const log = log4js.getLogger()
 
+const keyObject = 'resource'
 export class AbstractResourceContract<T extends StateObject> extends ContractBase {
     private readonly objConstructor: new (d?) => T & IResource
     private readonly type: string
 
     constructor(type: string, Tconstructor: (new (d?) => T & IResource)) {
-        super(`resource-${type}`)
+        super(`${keyObject}-${type}`)
         this.type = type
         this.objConstructor = Tconstructor
     }
@@ -69,7 +69,7 @@ export class AbstractResourceContract<T extends StateObject> extends ContractBas
 
     @Transaction(false)
     public async getAll(ctx: Context): Promise<T[]> {
-        const iterator = ctx.stub.getStateByPartialCompositeKey(this.getName(), [this.type])
+        const iterator = ctx.stub.getStateByPartialCompositeKey(keyObject, [this.type])
         const resources = new Array<T>()
         for await (const result of iterator) {
             resources.push(new this.objConstructor(result.value))
@@ -78,6 +78,6 @@ export class AbstractResourceContract<T extends StateObject> extends ContractBas
     }
 
     private _getKey(ctx: Context, id: string) {
-        return ctx.stub.createCompositeKey(this.getName(), [this.type, id])
+        return ctx.stub.createCompositeKey(keyObject, [this.type, id])
     }
 }

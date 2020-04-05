@@ -1,12 +1,13 @@
 import {Context, Transaction} from 'fabric-contract-api'
-import {Error} from 'tslint/lib/error'
 import {v4 as uuidv4} from 'uuid'
 import {IPrincipal, IResource, PolicyType} from '../domain/interfaces'
 import Policy from '../domain/policy'
-import {Utils} from '../utils'
+import log from '../utils/log'
+import {Marshall} from '../utils/marshall'
 import {ContractBase} from './contractbase'
 import {PrincipalContract} from './principal/principalContract'
 import {ResourceContract} from './resource/resourceContract'
+
 
 export class PolicyContract extends ContractBase {
     private readonly principalContract: PrincipalContract
@@ -19,17 +20,25 @@ export class PolicyContract extends ContractBase {
     }
 
     @Transaction()
-    public async createPolicy(ctx: Context, policyStr: string): Promise<void> {
-        const p = new Policy(policyStr)
+    public async createPolicy(ctx: Context, policyStr: string): Promise<string> {
 
-        this._validatePolicy(p)
+        try {
+            const p = new Policy(policyStr)
 
-        // Generate ID value if none exists
-        if (!p.id) { p.id = uuidv4() }
+            this._validatePolicy(p)
 
-        await ctx.stub.putState(this._getPolicyKey(ctx, p.id), p.toBuffer())
+            // Generate ID value if none exists
+            if (!p.id) { p.id = uuidv4() }
 
-        this._updateResourceAccess(ctx, p)
+
+            await ctx.stub.putState(this._getPolicyKey(ctx, p.id), p.toBuffer())
+            log.info(`Added new policy with id ${p.id}`)
+            await this._updateResourceAccess(ctx, p)
+            return `Successfully added new access policy of type: ${PolicyType[p.type]} with ID: ${p.id}`
+        } catch (error) {
+            log.error(`Error while creating new policy: ${error.message}`)
+            throw error
+        }
     }
 
     @Transaction()
@@ -66,6 +75,7 @@ export class PolicyContract extends ContractBase {
     @Transaction()
     public async deletePolicy(ctx: Context, id: string): Promise<string> {
         await ctx.stub.deleteState(this._getPolicyKey(ctx, id))
+        // TODO: Update resource access for all principals
         return `Successfully deleted policy ID: ${id}`
     }
 
@@ -74,23 +84,28 @@ export class PolicyContract extends ContractBase {
         return await this._getPolicies(ctx)
     }
 
-    public async getAllPoliciesRelatedToPrincipal(ctx: Context, p: IPrincipal): Promise<Policy[]> {
+    public async updateResourceAccessForPrincipal(ctx: Context, p: IPrincipal) {
+        const {name, id} = p
+        const policies = await this.getAllPoliciesRelatedToPrincipal(ctx, p)
+
+        for (const policy of policies) {
+            const resources = await this._getResourceIDsUnderPolicy(ctx, policy)
+            this.addResourcesToPrincipal(p, resources)
+        }
+        log.info(`Principal ID: ${id}, Name: ${name} granted access to the following resources: ${p.resourceGrants}`)
+    }
+
+    private async getAllPoliciesRelatedToPrincipal(ctx: Context, p: IPrincipal): Promise<Policy[]> {
         return await this._getPolicies(ctx, (policy: Policy) => policy.principalId === p.id || matchingRoles(policy, p))
     }
 
-    // TODO
-    public async updateResourceAccessForPrincipal(ctx: Context, principalContract: PrincipalContract, p: IPrincipal) {
-        const policies = await this.getAllPoliciesRelatedToPrincipal(ctx, p)
-
-    }
-
-    private async _getPolicies(ctx: Context, filter?: (p: Policy) => boolean) {
+    private async _getPolicies(ctx: Context, filter?: (p: Policy) => boolean): Promise<Policy[]> {
         const policyIterator = ctx.stub.getStateByPartialCompositeKey(this.getName(), [])
         const policies = new Array<Policy>()
         for await (const result of policyIterator) {
-            policies.push(Utils.marshallToObject(result.value, {}))
+            policies.push(Marshall.marshallToObject(result.value, {}))
         }
-        return policies
+        return filter ? policies.filter(filter) : policies
     }
 
     private _validatePolicy(p: Policy) {
@@ -128,13 +143,24 @@ export class PolicyContract extends ContractBase {
     }
 
     private async _updateResourceAccess(ctx: Context, p: Policy): Promise<void> {
-        const resources = await this._getResourceIDsUnderPolicy(ctx, p)
         const principalMap = await this._getPrincipalsUnderPolicy(ctx, p)
+        log.debug(`Principals matching policy: ${Array.from(principalMap.values()).map((prn) => prn.name).toString()}`)
+
+        const resources = await this._getResourceIDsUnderPolicy(ctx, p)
+        log.debug(`Resources matching policy: ${resources.toString()}`)
 
         for (const [id, principal] of principalMap) {
-            resources.forEach(principal.resourceGrants.add)
+            this.addResourcesToPrincipal(principal, resources)
             await this.principalContract.updateByID(ctx, id, principal)
         }
+    }
+
+    private addResourcesToPrincipal(principal: IPrincipal, resources: string[]) {
+        log.info(`Updating resource action for principal ${principal.name}, ID: ${principal.id}`)
+        if (!principal.resourceGrants) {
+            principal.resourceGrants = new Set()
+        }
+        resources.forEach((r) => principal.resourceGrants.add(r))
     }
 
     private async _getResourceIDsUnderPolicy(ctx: Context, p: Policy): Promise<string[]> {
@@ -166,6 +192,8 @@ export class PolicyContract extends ContractBase {
             case PolicyType.ROLES_TAGS:
             case PolicyType.ROLES_RESOURCE: {
                 const principalMap = await this.principalContract.getAll(ctx)
+                log.debug(`Result of principal contract get all: ${Array.from(principalMap.values()).map((prn) => prn.name).toString()}`)
+
                 principalMap.forEach((v, k, map) => {
                     if (!matchingRoles(p, v)) {
                         map.delete(k)
@@ -182,9 +210,9 @@ export class PolicyContract extends ContractBase {
 }
 
 function matchingRoles(policy: Policy, principal: IPrincipal): boolean {
-    return principal.roles.some(policy.principalRoles.includes)
+    return principal.roles.some((r) => policy.principalRoles.includes(r))
 }
 
 function matchingTags(policy: Policy, resource: IResource): boolean {
-    return resource.tags.some(policy.resourceTags.includes)
+    return resource.tags.some((t) => policy.resourceTags.includes(t))
 }

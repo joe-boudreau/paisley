@@ -1,4 +1,4 @@
-export class Utils {
+export class Marshall {
 
     public static marshallToObject(data: Buffer | string | object, obj: object) {
         let json
@@ -7,12 +7,13 @@ export class Utils {
                 return
             }
 
-            json = JSON.parse(data.toString('utf-8'), Utils.reviver)
+            json = JSON.parse(data.toString('utf-8'), Marshall.reviver)
         } else if (typeof data === 'string') {
-            json = JSON.parse(data, Utils.reviver)
+            json = JSON.parse(data, Marshall.reviver)
         } else {
             json = data
         }
+        console.log(`JSON: ${json}`)
         return Object.assign(obj, json)
     }
 
