@@ -1,4 +1,4 @@
-import {Marshall} from '../utils/marshall'
+import { Marshall } from '../utils/marshall'
 
 class StateObject {
 
