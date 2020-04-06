@@ -1,7 +1,7 @@
-import {IAccessEvent} from './interfaces'
+import { IAccessEvent } from './interfaces'
 import StateObject from './stateobject'
 
-class AccessEvent extends StateObject implements IAccessEvent{
+class AccessEvent extends StateObject implements IAccessEvent {
     public id: string
     public granted: boolean
     public principalId: string

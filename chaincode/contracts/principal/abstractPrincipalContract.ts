@@ -10,11 +10,24 @@ log4js.configure('log4js.json')
 const log = log4js.getLogger()
 
 const keyObject = 'principal'
+
+/**
+ * Generic class to represent a principal object in the principal-resource security model
+ * Performs CRUD operations for principal entities on the ledger. Any object class which implements
+ * the IPrincipal interface can extend this class to create a contract for it's management
+ *
+ * e.g.
+ * class EmployeeContract extends AbstractPrincipalContract<Employee> {constructor() {super('employee', Employee)}}
+ */
 export class AbstractPrincipalContract<T extends StateObject> extends ContractBase {
     private readonly objConstructor: new (d?) => T & IPrincipal
     private readonly type: string
     private readonly policyContract: PolicyContract
 
+    /**
+     * @param type The principal type
+     * @param Tconstructor A constructor function which can deserialize data from multiple encodings
+     */
     constructor(type: string, Tconstructor: (new (d?) => T & IPrincipal)) {
         super(`${keyObject}-${type}`)
         this.type = type
@@ -83,6 +96,7 @@ export class AbstractPrincipalContract<T extends StateObject> extends ContractBa
     }
 
     private _getKey(ctx: Context, id: string) {
+        // Key format: principal:type:id
         return ctx.stub.createCompositeKey(keyObject, [this.type, id])
     }
 }

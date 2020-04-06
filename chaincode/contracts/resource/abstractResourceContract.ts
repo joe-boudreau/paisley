@@ -9,11 +9,23 @@ import {PolicyContract} from '../policyContract'
 
 
 const keyObject = 'resource'
+/**
+ * Generic class to represent a resource in the principal-resource security model
+ * Performs CRUD operations for resource entities on the ledger. Any object class which implements
+ * the IResource interface can extend this class to create a contract for it's management
+ *
+ * e.g.
+ * class AreaContract extends AbstractResourceContract<Area> {constructor() {super('area', Area)}}
+ */
 export class AbstractResourceContract<T extends StateObject> extends ContractBase {
     private readonly objConstructor: new (d?) => T & IResource
     private readonly type: string
     private readonly policyContract: PolicyContract
 
+    /**
+     * @param type The resource type
+     * @param Tconstructor A constructor function which can deserialize data from multiple encodings
+     */
     constructor(type: string, Tconstructor: (new (d?) => T & IResource)) {
         super(`${keyObject}-${type}`)
         this.type = type
