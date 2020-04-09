@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "downlevelIteration": true,
+    "resolveJsonModule": true,
+    "module": "commonjs",
+    "target": "es2018",
+    "outDir": "dist",
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "lib": [
+      "es2018",
+      "esnext.asynciterable"
+    ]
+  },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "include": [
+    "**/*",
+    "log4js.json"
+  ]
+}
