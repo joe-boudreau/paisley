@@ -1,0 +1,22 @@
+{
+  "extends": "tslint:recommended",
+  "rules": {
+    "max-line-length": {
+      "options": [120]
+    },
+    "new-parens": true,
+    "no-arg": true,
+    "no-bitwise": true,
+    "no-conditional-assignment": true,
+    "no-consecutive-blank-lines": false,
+    "quotemark": {
+      "options": "single"
+    },
+    "semicolon": {
+      "options": "never"
+    },
+    "no-console": false,
+    "import-spacing": true,
+    "whitespace": [true, "check-module"]
+  }
+}

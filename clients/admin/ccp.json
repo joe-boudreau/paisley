@@ -1,0 +1,50 @@
+{
+  "name": "Org1",
+  "version": "1.0.0",
+  "client": {
+    "organization": "Org1",
+    "connection": {
+      "timeout": {
+        "peer": {
+          "endorser": "300"
+        },
+        "orderer": "300"
+      }
+    }
+  },
+  "channels": {
+    "org-channel": {
+      "orderers": [
+        "orderer.companyABC.com"
+      ],
+      "peers": {
+        "peer0.org1.companyABC.com": {}
+      }
+    }
+  },
+  "organizations": {
+    "Org1": {
+      "mspid": "Org1MSP",
+      "cryptoPath": "../../network/crypto-config/peerOrganizations/org1.companyABC.com/users/Admin@org1.companyABC.com/msp",
+      "peers": [
+        "peer0.org1.companyABC.com"
+      ]
+    },
+    "OrdererOrg": {
+      "mspid": "OrdererMSP",
+      "cryptoPath": "../../network/crypto-config/ordererOrganizations/companyABC.com/users/Admin@companyABC.com/msp"
+    }
+  },
+  "peers": {
+    "peer0.org1.companyABC.com": {
+      "url": "grpcs://localhost:7051",
+      "tlsCACerts": {
+        "pem": "network-certs/peer-tls-ca-cert.pem"
+      },
+      "grpcOptions": {
+        "ssl-target-name-override": "peer0.org1.companyABC.com",
+        "hostnameOverride": "peer0.org1.companyABC.com"
+      }
+    }
+  }
+}

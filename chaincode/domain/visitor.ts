@@ -1,4 +1,4 @@
-import {IVisitor} from './interfaces'
+import { IVisitor } from './interfaces'
 import StateObject from './stateobject'
 
 class Visitor extends StateObject implements IVisitor {

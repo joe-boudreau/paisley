@@ -9,7 +9,7 @@ class Employee extends StateObject implements IEmployee {
     public roles: string[]
     public title: string
     public department: string
-    public resourceGrants: Set<string> = new Set()
+    public resourceGrants: Set<string>
 }
 
 export = Employee

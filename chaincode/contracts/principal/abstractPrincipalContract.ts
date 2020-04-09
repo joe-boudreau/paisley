@@ -90,7 +90,9 @@ export class AbstractPrincipalContract<T extends StateObject> extends ContractBa
         const iterator = ctx.stub.getStateByPartialCompositeKey(keyObject, [this.type])
         const principals = new Array<T>()
         for await (const result of iterator) {
-            principals.push(new this.objConstructor(result.value))
+            const emp = new this.objConstructor(result.value)
+            log.info(`Resource grants: ${Array.from(emp.resourceGrants).toString()}`)
+            principals.push(emp)
         }
         return principals
     }

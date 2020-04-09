@@ -91,7 +91,7 @@ export class PolicyContract extends ContractBase {
             const resources = await this._getResourceIDsUnderPolicy(ctx, policy)
             this.addResourcesToPrincipal(p, resources)
         }
-        log.info(`Principal ID: ${id}, Name: ${name} granted access to the following resources: ${p.resourceGrants}`)
+        log.info(`Principal ID: ${id}, Name: ${name} granted access to the following resources: ${JSON.stringify(p.resourceGrants)}`)
     }
 
     public async newResourceUpdate(ctx: Context, r: IResource) {

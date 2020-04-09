@@ -1,3 +1,5 @@
+import log from './log'
+
 export class Marshall {
 
     public static marshallToObject(data: Buffer | string | object, obj: object) {
@@ -7,10 +9,14 @@ export class Marshall {
                 return
             }
 
-            json = JSON.parse(data.toString('utf-8'), Marshall.reviver)
+            const buf = data.toString('utf-8')
+            log.info(`Buffer passed: ${buf}`)
+            json = JSON.parse(buf, Marshall.reviver)
         } else if (typeof data === 'string') {
+            log.info(`String passed: ${data}`)
             json = JSON.parse(data, Marshall.reviver)
         } else {
+            log.warn(`Direct object passed to be marshalled: ${JSON.stringify(data)}`)
             json = data
         }
         return Object.assign(obj, json)
