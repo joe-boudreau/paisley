@@ -183,13 +183,13 @@ export class PolicyContract extends ContractBase {
         switch (p.type) {
             case PolicyType.ID_RESOURCE:
             case PolicyType.ROLES_RESOURCE: {
-                const [_, resource] = await this.resourceContract.getByID(ctx, p.resourceId)
+                const [_, resource] = await this.resourceContract.getByIDWithKey(ctx, p.resourceId)
                 return [resource.id]
             }
 
             case PolicyType.ID_TAGS:
             case PolicyType.ROLES_TAGS: {
-                const resourceMap = await this.resourceContract.getAll(ctx)
+                const resourceMap = await this.resourceContract.getAllMap(ctx)
                 return Array.from(resourceMap.values())
                     .filter((resource) => matchingTags(p, resource))
                     .map((r) => r.id)
@@ -201,13 +201,13 @@ export class PolicyContract extends ContractBase {
         switch (p.type) {
             case PolicyType.ID_TAGS:
             case PolicyType.ID_RESOURCE: {
-                const result = await this.principalContract.getByID(ctx, p.principalId)
+                const result = await this.principalContract.getByIDWithKey(ctx, p.principalId)
                 return new Map([result])
             }
 
             case PolicyType.ROLES_TAGS:
             case PolicyType.ROLES_RESOURCE: {
-                const principalMap = await this.principalContract.getAll(ctx)
+                const principalMap = await this.principalContract.getAllMap(ctx)
                 log.debug(`Result of principal contract get all: ${Array.from(principalMap.values()).map((prn) => prn.name).toString()}`)
 
                 principalMap.forEach((v, k, map) => {

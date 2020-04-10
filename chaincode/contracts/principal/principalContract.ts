@@ -1,6 +1,6 @@
 import { Context, Transaction } from 'fabric-contract-api'
 import log4js from 'log4js'
-import { IPrincipal } from '../../domain/interfaces'
+import { IPrincipal, IResource } from '../../domain/interfaces'
 import StateObject from '../../domain/stateobject'
 import log from '../../utils/log'
 import { Marshall } from '../../utils/marshall'
@@ -16,7 +16,12 @@ export class PrincipalContract  extends ContractBase {
     }
 
     @Transaction(false)
-    public async getAll(ctx: Context): Promise<Map<string, IPrincipal>> {
+    public async getAll(ctx: Context): Promise<IPrincipal[]> {
+        const all = await this.getAllMap(ctx)
+        return Array.from(all.values())
+    }
+
+    public async getAllMap(ctx: Context): Promise<Map<string, IPrincipal>> {
         const iterator = ctx.stub.getStateByPartialCompositeKey(this.getName(), [])
         const principals = new Map<string, IPrincipal>()
         for await (const result of iterator) {
@@ -26,7 +31,12 @@ export class PrincipalContract  extends ContractBase {
     }
 
     @Transaction(false)
-    public async getByID(ctx: Context, id: string): Promise<[string, IPrincipal]> {
+    public async getByID(ctx: Context, id: string): Promise<IPrincipal> {
+        const [_, principal] = await this.getByIDWithKey(ctx, id)
+        return principal
+    }
+
+    public async getByIDWithKey(ctx: Context, id: string): Promise<[string, IPrincipal]> {
         /**
          * TOOD: This is a bad implementation but I am limited by the hierarchical structure
          * of keys. Principal keys are stored as 'principal:{type}:{id}' so I cannot query

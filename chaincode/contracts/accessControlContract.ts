@@ -18,7 +18,7 @@ export class AccessControlContract  extends ContractBase {
 
     @Transaction()
     public async authorizeById(ctx: Context, principalId: string, resourceId: string): Promise<boolean> {
-        const [_, principal] = await this.principalContract.getByID(ctx, principalId)
+        const [_, principal] = await this.principalContract.getByIDWithKey(ctx, principalId)
 
         const event = new AccessEvent()
         event.principalId = principal.id

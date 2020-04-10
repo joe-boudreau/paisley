@@ -16,7 +16,12 @@ export class ResourceContract  extends ContractBase {
     }
 
     @Transaction(false)
-    public async getAll(ctx: Context): Promise<Map<string, IResource>> {
+    public async getAll(ctx: Context): Promise<IResource[]> {
+        const all = await this.getAllMap(ctx)
+        return Array.from(all.values())
+    }
+
+    public async getAllMap(ctx: Context): Promise<Map<string, IResource>> {
         const iterator = ctx.stub.getStateByPartialCompositeKey(this.getName(), [])
         const resources = new Map<string, IResource>()
         for await (const result of iterator) {
@@ -28,7 +33,12 @@ export class ResourceContract  extends ContractBase {
     }
 
     @Transaction(false)
-    public async getByID(ctx: Context, id: string): Promise<[string, IResource]> {
+    public async getByID(ctx: Context, id: string): Promise<IResource> {
+        const [_, resource] = await this.getByIDWithKey(ctx, id)
+        return resource
+    }
+
+    public async getByIDWithKey(ctx: Context, id: string): Promise<[string, IResource]> {
         /**
          * TOOD: This is a bad implementation but I am limited by the hierarchical structure
          * of keys. Principal keys are stored as 'resource:{type}:{id}' so I cannot query

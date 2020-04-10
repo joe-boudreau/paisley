@@ -1,52 +1,59 @@
 import { FileSystemWallet, Gateway } from 'fabric-network'
-import fs from 'fs'
 import { generateWallet } from './addToWallet'
 
 async function main() {
 
-    // A wallet stores a collection of identities for use
     const wallet = await new FileSystemWallet('wallet')
-
-    // A gateway defines the peers used to access Fabric networks
     const gateway = new Gateway()
 
     try {
 
-        // Specify username for network access
         const username = 'user'
+        const mspIdentity = `${username}MSP`
+        const tlsIdentity = `${username}TLS`
 
-        // Check to see if we've already enrolled the user.
-        const userIdentity = await wallet.exists(username)
-        if (!userIdentity) {
+        if (!await wallet.exists(mspIdentity) || !await wallet.exists(tlsIdentity)) {
             console.log(`An identity for the user ${username} does not exist, generating wallet now...`)
-            await generateWallet()
+            await generateWallet(username)
         }
 
-        // Set connection options identity and wallet
         let connectionOptions = {
-            identity: username,
+            identity: mspIdentity,
+            clientTlsIdentity: tlsIdentity,
             wallet: wallet,
             discovery: { enabled: true, asLocalhost: true }
 
         }
 
-        // Connect to gateway using application specified parameters
-        console.log('Connect to Fabric gateway.')
-
         await gateway.connect("ccp.json", connectionOptions)
 
-        const clientKey = fs.readFileSync('../../network/crypto-config/peerOrganizations/org1.companyABC.com/users/User1@org1.companyABC.com/tls/client.key')
-        const clientCert = fs.readFileSync('../../network/crypto-config/peerOrganizations/org1.companyABC.com/users/User1@org1.companyABC.com/tls/client.crt')
-
-        gateway.getClient().setTlsClientCertAndKey(Buffer.from(clientCert).toString(), Buffer.from(clientKey).toString());
-
         const network = await gateway.getNetwork('org-channel')
+        const contract = await network.getContract('chaincode', 'access-control')
 
-        const contract = await network.getContract('chaincode', 'principal')
+        const transaction = contract.createTransaction('authorizeById')
+        const start = new Date()
 
-        const response = await contract.evaluateTransaction('getAll')
+        console.log(`Start: ${start}`)
+        await transaction.addCommitListener((error: Error, txId: string, status: string, blockNumber: string) => {
+            if(error) {
+                console.log(`Error: ${error.message}`)
+            }
+            console.log(`txId: ${txId}`)
+            console.log(`Status: ${status}`)
+            console.log(`Block Number: ${blockNumber}`)
 
-        console.log(`Get All response: ${response.toString()}`)
+            const commitTime = new Date()
+            console.log(`Commit time: ${commitTime}`)
+            console.log(`Time to commit: ${commitTime.getTime() - start.getTime()}`)
+        })
+
+        const resp = await transaction.submit("74d4a01b-7260-41de-bceb-caecd8813ade", "5db22aeb-6701-4fdd-a18a-adcf384aaa62")
+
+        const submitTime = new Date()
+        console.log(`Submit time: ${submitTime}`)
+        console.log(`Time to submit: ${submitTime.getTime() - start.getTime()}`)
+
+        console.log(`Authorization response: ${resp.toString()}`)
 
     } catch (error) {
 

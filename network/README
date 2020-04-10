@@ -83,7 +83,7 @@ Example: scripts/deployCC.sh org-channel ../chaincode 5
 ------------------------------------------------------------------------------------------------------------------------
 # MISC COMMANDS:
     logspout:
-        scripts/monitordocker.sh paisley
+        scripts/monitordocker.sh paisley_network
     clear all docker volumes / containers / images:
         docker volume rm $(docker volume ls)
         docker rm -f $(docker ps -aq)

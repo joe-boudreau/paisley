@@ -2,7 +2,7 @@ import { FileSystemWallet, X509WalletMixin } from 'fabric-network'
 import fs from 'fs'
 import * as path from 'path'
 
-export async function generateWallet() {
+export async function generateWallet(username: string) {
     try {
         const wallet = await new FileSystemWallet('wallet')
 
@@ -19,8 +19,8 @@ export async function generateWallet() {
         const tlsIdentity = X509WalletMixin.createIdentity('Org1MSP', tlsCert, tlsKey)
 
         // Load credentials into wallet
-        await wallet.import('userMSP', mspIdentity)
-        await wallet.import('userTLS', tlsIdentity)
+        await wallet.import(`${username}MSP`, mspIdentity)
+        await wallet.import(`${username}TLS`, tlsIdentity)
 
     } catch (error) {
         console.log(`Error adding to wallet. ${error}`)
