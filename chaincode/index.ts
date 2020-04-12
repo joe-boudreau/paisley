@@ -13,6 +13,8 @@ export { PolicyContract } from './contracts/policyContract'
 import { ResourceContract } from './contracts/resource/resourceContract'
 export { ResourceContract } from './contracts/resource/resourceContract'
 
+// All contracts available to the chaincode - any new contracts must be imported to this file, exported, and also added
+// to the contracts array
 export const contracts: any[] = [EmployeeContract,
                                  VisitorContract,
                                  PrincipalContract,

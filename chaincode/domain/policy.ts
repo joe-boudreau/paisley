@@ -1,4 +1,4 @@
-import {IPolicy, PolicyType} from './interfaces'
+import { IPolicy, PolicyType } from './interfaces'
 import StateObject from './stateobject'
 
 class Policy extends StateObject implements IPolicy {

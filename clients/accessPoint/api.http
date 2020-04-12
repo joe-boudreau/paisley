@@ -1,0 +1,18 @@
+POST http://localhost:3000/auth/id?verifyCommit=false
+Content-Type: application/json
+
+{
+  "principalId": "74d4a01b-7260-41de-bceb-caecd8813ade",
+  "resourceId": "5db22aeb-6701-4fdd-a18a-adcf384aaa62"
+}
+
+###
+POST http://localhost:3000/auth/id?verifyCommit=true
+Content-Type: application/json
+
+{
+  "principalId": "74d4a01b-7260-41de-bceb-caecd8813ade",
+  "resourceId": "5db22aeb-6701-4fdd-a18a-adcf384aaa62"
+}
+
+###

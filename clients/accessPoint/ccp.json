@@ -18,7 +18,8 @@
         "orderer.companyABC.com"
       ],
       "peers": {
-        "peer0.org1.companyABC.com": {}
+        "peer0.org1.companyABC.com": {},
+        "peer1.org1.companyABC.com": {}
       }
     }
   },
@@ -27,7 +28,8 @@
       "mspid": "Org1MSP",
       "cryptoPath": "../../network/crypto-config/peerOrganizations/org1.companyABC.com/users/User1@org1.companyABC.com/msp",
       "peers": [
-        "peer0.org1.companyABC.com"
+        "peer0.org1.companyABC.com",
+        "peer1.org1.companyABC.com"
       ]
     }
   },
@@ -40,6 +42,16 @@
       "grpcOptions": {
         "ssl-target-name-override": "peer0.org1.companyABC.com",
         "hostnameOverride": "peer0.org1.companyABC.com"
+      }
+    },
+    "peer1.org1.companyABC.com": {
+      "url": "grpcs://localhost:8051",
+      "tlsCACerts": {
+        "path": "../../network/crypto-config/peerOrganizations/org1.companyABC.com/tlsca/tlsca.org1.companyABC.com-cert.pem"
+      },
+      "grpcOptions": {
+        "ssl-target-name-override": "peer1.org1.companyABC.com",
+        "hostnameOverride": "peer1.org1.companyABC.com"
       }
     }
   }

@@ -8,7 +8,11 @@ import { ContractBase } from './contractbase'
 import { PrincipalContract } from './principal/principalContract'
 import { ResourceContract } from './resource/resourceContract'
 
-
+/**
+ * Policy Contract contains all the business logic maintaining resource access for principals. Resource access is stored
+ * as a derived field in each IPrincipal entity. This 'pre-calculation' of access rights ensures that real-time access
+ * events are responded to as quickly as possible.
+ */
 export class PolicyContract extends ContractBase {
     private readonly principalContract: PrincipalContract
     private readonly resourceContract: ResourceContract
