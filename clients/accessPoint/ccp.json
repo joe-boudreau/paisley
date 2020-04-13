@@ -15,7 +15,9 @@
   "channels": {
     "org-channel": {
       "orderers": [
-        "orderer.companyABC.com"
+        "orderer0.companyABC.com",
+        "orderer1.companyABC.com",
+        "orderer2.companyABC.com"
       ],
       "peers": {
         "peer0.org1.companyABC.com": {},

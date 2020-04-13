@@ -183,12 +183,22 @@ Orderer: &OrdererDefaults
 
   EtcdRaft:
     Consenters:
-      - Host: orderer.companyABC.com
+      - Host: orderer0.companyABC.com
         Port: 7050
-        ClientTLSCert: crypto-config/ordererOrganizations/companyABC.com/orderers/orderer.companyABC.com/tls/server.crt
-        ServerTLSCert: crypto-config/ordererOrganizations/companyABC.com/orderers/orderer.companyABC.com/tls/server.crt
+        ClientTLSCert: crypto-config/ordererOrganizations/companyABC.com/orderers/orderer0.companyABC.com/tls/server.crt
+        ServerTLSCert: crypto-config/ordererOrganizations/companyABC.com/orderers/orderer0.companyABC.com/tls/server.crt
+      - Host: orderer1.companyABC.com
+        Port: 7050
+        ClientTLSCert: crypto-config/ordererOrganizations/companyABC.com/orderers/orderer1.companyABC.com/tls/server.crt
+        ServerTLSCert: crypto-config/ordererOrganizations/companyABC.com/orderers/orderer1.companyABC.com/tls/server.crt
+      - Host: orderer2.companyABC.com
+        Port: 7050
+        ClientTLSCert: crypto-config/ordererOrganizations/companyABC.com/orderers/orderer2.companyABC.com/tls/server.crt
+        ServerTLSCert: crypto-config/ordererOrganizations/companyABC.com/orderers/orderer2.companyABC.com/tls/server.crt
   Addresses:
-    - orderer.companyABC.com:7050
+    - orderer0.companyABC.com:7050
+    - orderer1.companyABC.com:7050
+    - orderer2.companyABC.com:7050
 
   # Batch Timeout: The amount of time to wait before creating a batch
   BatchTimeout: 2s

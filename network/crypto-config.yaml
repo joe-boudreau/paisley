@@ -16,7 +16,21 @@ OrdererOrgs:
     # "Specs" - See PeerOrgs below for complete description
     # ---------------------------------------------------------------------------
     Specs:
-      - Hostname: orderer
+      - Hostname: orderer0
+        SANS:
+          - "localhost"
+          - "127.0.0.1"
+          - "::1"
+      - Hostname: orderer1
+        SANS:
+          - "localhost"
+          - "127.0.0.1"
+          - "::1"
+      - Hostname: orderer2
+        SANS:
+          - "localhost"
+          - "127.0.0.1"
+          - "::1"
 
 # ---------------------------------------------------------------------------
 # "PeerOrgs" - Definition of organizations managing peer nodes

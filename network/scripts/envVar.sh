@@ -7,13 +7,13 @@
 # This is a collection of bash functions used by different scripts
 
 export CORE_PEER_TLS_ENABLED=true
-export ORDERER_CA=crypto-config/ordererOrganizations/companyABC.com/orderers/orderer.companyABC.com/msp/tlscacerts/tlsca.companyABC.com-cert.pem
+export ORDERER_CA=crypto-config/ordererOrganizations/companyABC.com/tlsca/tlsca.companyABC.com-cert.pem
 export PEER0_ORG1_CA=crypto-config/peerOrganizations/org1.companyABC.com/peers/peer0.org1.companyABC.com/tls/ca.crt
 
 # Set OrdererOrg.Admin globals
 setOrdererGlobals() {
   export CORE_PEER_LOCALMSPID="OrdererMSP"
-  export CORE_PEER_TLS_ROOTCERT_FILE=crypto-config/ordererOrganizations/companyABC.com/orderers/orderer.companyABC.com/msp/tlscacerts/tlsca.companyABC.com-cert.pem
+  export CORE_PEER_TLS_ROOTCERT_FILE=crypto-config/ordererOrganizations/companyABC.com/orderers/orderer0.companyABC.com/msp/tlscacerts/tlsca.companyABC.com-cert.pem
   export CORE_PEER_MSPCONFIGPATH=crypto-config/ordererOrganizations/companyABC.com/users/Admin@companyABC.com/msp
 }
 
