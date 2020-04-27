@@ -1,2 +1,2 @@
-![Paisley logo](documentation/paisley.png)
+![Paisley logo](documentation/paisley-small.png)
 Blockchain based physical access control management using Hyperledger Fabric
