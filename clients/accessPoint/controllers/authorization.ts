@@ -28,7 +28,7 @@ export class AuthorizationController {
                 identity: walletInfo.mspName,
                 clientTlsIdentity: walletInfo.tlsName,
                 wallet: walletInfo.wallet,
-                discovery: { enabled: true, asLocalhost: true },
+                discovery: { enabled: false, asLocalhost: false },
                 eventHandlerOptions: {
                     strategy: verifyCommit? DefaultEventHandlerStrategies.MSPID_SCOPE_ALLFORTX : null
                 }

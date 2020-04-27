@@ -28,18 +28,32 @@
   "organizations": {
     "Org1": {
       "mspid": "Org1MSP",
-      "cryptoPath": "../../network/crypto-config/peerOrganizations/org1.companyABC.com/users/User1@org1.companyABC.com/msp",
+      "cryptoPath": "crypto-config/peerOrganizations/org1.companyABC.com/users/User1@org1.companyABC.com/msp",
       "peers": [
         "peer0.org1.companyABC.com",
         "peer1.org1.companyABC.com"
       ]
     }
   },
+
+  "orderers": {
+    "orderer0.companyABC.com": {
+      "url": "grpcs://ec2-52-91-27-118.compute-1.amazonaws.com:7050",
+      "tlsCACerts": {
+        "path": "crypto-config/ordererOrganizations/companyABC.com/tlsca/tlsca.companyABC.com-cert.pem"
+      },
+      "grpcOptions": {
+        "ssl-target-name-override": "orderer0.companyABC.com",
+        "hostnameOverride": "orderer0.companyABC.com"
+      }
+    }
+  },
+
   "peers": {
     "peer0.org1.companyABC.com": {
-      "url": "grpcs://localhost:7051",
+      "url": "grpcs://ec2-52-91-27-118.compute-1.amazonaws.com:7051",
       "tlsCACerts": {
-        "path": "../../network/crypto-config/peerOrganizations/org1.companyABC.com/tlsca/tlsca.org1.companyABC.com-cert.pem"
+        "path": "crypto-config/peerOrganizations/org1.companyABC.com/tlsca/tlsca.org1.companyABC.com-cert.pem"
       },
       "grpcOptions": {
         "ssl-target-name-override": "peer0.org1.companyABC.com",
@@ -47,9 +61,9 @@
       }
     },
     "peer1.org1.companyABC.com": {
-      "url": "grpcs://localhost:8051",
+      "url": "grpcs://ec2-52-91-27-118.compute-1.amazonaws.com:8051",
       "tlsCACerts": {
-        "path": "../../network/crypto-config/peerOrganizations/org1.companyABC.com/tlsca/tlsca.org1.companyABC.com-cert.pem"
+        "path": "crypto-config/peerOrganizations/org1.companyABC.com/tlsca/tlsca.org1.companyABC.com-cert.pem"
       },
       "grpcOptions": {
         "ssl-target-name-override": "peer1.org1.companyABC.com",

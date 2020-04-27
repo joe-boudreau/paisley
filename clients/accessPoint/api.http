@@ -2,8 +2,8 @@ POST http://localhost:3000/auth/id?verifyCommit=false
 Content-Type: application/json
 
 {
-  "principalId": "e6d046a2-449e-43ac-9d1a-5ad8ebd3391f",
-  "resourceId": "f82523fa-34c7-41b3-b730-db19ee936958"
+  "principalId": "3281ee12-d723-4077-ad0c-87ef5e993fdd",
+  "resourceId": "a76a8df4-aa0e-41be-8b47-f0003fb7f60a"
 }
 
 ###
@@ -11,8 +11,8 @@ POST http://localhost:3000/auth/id?verifyCommit=true
 Content-Type: application/json
 
 {
-  "principalId": "e6d046a2-449e-43ac-9d1a-5ad8ebd3391f",
-  "resourceId": "f82523fa-34c7-41b3-b730-db19ee936958"
+  "principalId": "3281ee12-d723-4077-ad0c-87ef5e993fdd",
+  "resourceId": "a76a8df4-aa0e-41be-8b47-f0003fb7f60a"
 }
 
 ###
